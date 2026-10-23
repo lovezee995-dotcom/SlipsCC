@@ -5,7 +5,8 @@ const axios = require('axios');
 const FormData = require('form-data');
 const { initializeApp, cert } = require('firebase-admin/app');
 const { getFirestore, FieldValue } = require('firebase-admin/firestore');
-const serviceAccount = require('.//serviceAccountKey.json');
+// โหลดค่ากุญแจ Firebase จาก Environment Variable ที่ตั้งไว้บน Render โดยตรง
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
 // 1. เชื่อมต่อฐานข้อมูล Firebase Firestore
 initializeApp({
