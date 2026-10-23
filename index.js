@@ -129,21 +129,34 @@ async function handleSlipCheck(event, client, storeId, storeData) {
 
     console.log(`📄 ข้อมูลผู้รับในสลิป -> ชื่อ: "${receiverName}" | เลขบัญชี: "${receiverAccount}"`);
 
-    // 4. เช็กว่าเป็นบัญชีของร้านนี้จริงหรือไม่ (รองรับทั้งแบบบัญชีเดียวและหลายบัญชี)
+    // 4. เช็กว่าเป็นบัญชีของร้านนี้จริงหรือไม่ (รองรับแบบเลขบัญชีโดนเซ็นเซอร์ xxx)
     const expectedAccounts = storeData.storeAccount; 
     if (expectedAccounts) {
-      // แปลงข้อมูลให้เป็นอาเรย์ (รองรับทั้งแบบข้อมูลเก่าที่เป็น string และแบบใหม่ที่เป็น array)
       const accountList = Array.isArray(expectedAccounts) ? expectedAccounts : [expectedAccounts];
       
+      // ดึงเฉพาะตัวเลขจากเลขบัญชีในสลิป (ไม่เอาตัว x และขีด)
       const cleanSlipAcc = receiverAccount.replace(/[^0-9]/g, '');
       
       let isMatch = false;
       for (const acc of accountList) {
         const cleanExpectedAcc = String(acc).replace(/[^0-9]/g, '');
-        if (cleanExpectedAcc !== '' && cleanSlipAcc.includes(cleanExpectedAcc)) {
-          isMatch = true;
-          break;
+        
+        if (cleanExpectedAcc !== '') {
+          // ดึง 3 ตัวหน้า และ 4 ตัวท้ายของร้านไว้เทียบ
+          const expectedPrefix = cleanExpectedAcc.substring(0, 3); // 3 ตัวแรก
+          const expectedSuffix = cleanExpectedAcc.slice(-4);       // 4 ตัวท้าย
+          
+          const slipPrefix = cleanSlipAcc.substring(0, 3);
+          const slipSuffix = cleanSlipAcc.slice(-4);
+
+          // เช็กว่าถ้า 3 ตัวหน้าตรงกัน หรือ 4 ตัวท้ายตรงกัน ให้ถือว่าใช่บัญชีเดียวกัน
+          if ((expectedPrefix && slipPrefix && expectedPrefix === slipPrefix) || 
+              (expectedSuffix && slipSuffix && expectedSuffix === slipSuffix)) {
+            isMatch = true;
+            break;
+          }
         }
+
         if (receiverName.includes(String(acc))) {
           isMatch = true;
           break;
