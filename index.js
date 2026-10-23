@@ -5,7 +5,7 @@ const axios = require('axios');
 const FormData = require('form-data');
 const { initializeApp, cert } = require('firebase-admin/app');
 const { getFirestore, FieldValue } = require('firebase-admin/firestore');
-const serviceAccount = require('./serviceAccountKey.json');
+const serviceAccount = require('.//serviceAccountKey.json');
 
 // 1. เชื่อมต่อฐานข้อมูล Firebase Firestore
 initializeApp({
